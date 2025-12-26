@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import {
@@ -31,10 +31,6 @@ import "./styles.css";
 
 // --- CONFIG MOCK (Demo Mode) ---
 // URL giả lập để bypass validation, dữ liệu lưu trên RAM
-const supabaseUrl = "https://qjuicdmbqfdcubjimdqp.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFqdWljZG1icWZkY3ViamltZHFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY2ODkyNTcsImV4cCI6MjA4MjI2NTI1N30.1t1Ike0BUkn8clg0DM6c31Dd7WpGBEfHmhHCn8l9_Gw";
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 // --- TYPES & INTERFACES ---
 interface UserProfile {
