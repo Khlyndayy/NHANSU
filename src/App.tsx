@@ -1,63 +1,104 @@
 import React, { useState, useEffect } from "react";
-
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import {
-  User,
-  Lock,
-  LogOut,
-  Clock,
-  Calendar,
-  DollarSign,
-  FileText,
   Briefcase,
-  Users,
+  Clock,
+  FileText,
   CheckCircle,
-  Printer,
-  Plus,
-  FileSignature, // ✅ Đã dùng FileSignature
+  Users,
+  DollarSign,
+  LogOut,
+  LayoutDashboard,
+  Shield,
   Search,
   UserCheck,
-  Shield,
-  Settings,
-  CreditCard,
   RefreshCw,
-  List,
   ClipboardList,
+  FileSignature,
+  Settings,
+  PieChart,
+  Printer,
+  CreditCard,
+  Calendar,
 } from "lucide-react";
-
-// === IMPORT CSS ===
 import "./styles.css";
 
-// --- CONFIG MOCK (Demo Mode) ---
-// URL giả lập để bypass validation, dữ liệu lưu trên RAM
+// --- 1. MOCK DATA (DỮ LIỆU GIẢ LẬP) ---
+const MOCK_USERS = [
+  {
+    id: 1,
+    username: "nhanvien",
+    password: "123",
+    name: "Nguyễn Văn A",
+    role: "NhanVien",
+    roleName: "Nhân Viên",
+  },
+  {
+    id: 2,
+    username: "truongbp",
+    password: "123",
+    name: "Trần Bếp Trưởng",
+    role: "TruongBoPhan",
+    roleName: "Trưởng BP",
+  },
+  {
+    id: 3,
+    username: "tuyendung",
+    password: "123",
+    name: "Lê Tuyển Dụng",
+    role: "BoPhanTuyenDung",
+    roleName: "Tuyển Dụng",
+  },
+  {
+    id: 4,
+    username: "phongvan",
+    password: "123",
+    name: "Phạm Phỏng Vấn",
+    role: "BoPhanPhongVan",
+    roleName: "Phỏng Vấn",
+  },
+  {
+    id: 5,
+    username: "qlns",
+    password: "123",
+    name: "Hoàng HR",
+    role: "QuanLyNhanSu",
+    roleName: "QL Nhân Sự",
+  },
+  {
+    id: 6,
+    username: "ketoan",
+    password: "123",
+    name: "Vũ Kế Toán",
+    role: "KeToan",
+    roleName: "Kế Toán",
+  },
+  {
+    id: 7,
+    username: "admin",
+    password: "123",
+    name: "System Admin",
+    role: "Admin",
+    roleName: "Quản Trị",
+  },
+];
 
-// --- TYPES & INTERFACES ---
-interface UserProfile {
-  id: string;
-  username: string;
-  full_name: string;
-  role: string;
-  department: string;
-}
+// --- 2. CÁC COMPONENT GIAO DIỆN THEO ACTOR ---
 
-// --- MODULES CHI TIẾT THEO YÊU CẦU ---
-
-// 1. DASHBOARD (Chung)
-const DashboardModule = ({ user }: { user: UserProfile }) => (
+// >> COMPONENT CHUNG
+const DashboardHome = ({ user }: { user: any }) => (
   <div>
-    <div className="dashboard-stats">
-      <div className="stat-card bg-blue">
-        <h4>Việc cần xử lý</h4>
-        <div style={{ fontSize: "32px", fontWeight: "bold" }}>5</div>
+    <div className="stats-grid">
+      <div className="stat-box bg-blue">
+        <h4>Công việc</h4>
+        <h1>5</h1>
       </div>
-      <div className="stat-card bg-green">
-        <h4>Công tháng này</h4>
-        <div style={{ fontSize: "32px", fontWeight: "bold" }}>22.5</div>
+      <div className="stat-box bg-green">
+        <h4>Nhân sự</h4>
+        <h1>42</h1>
       </div>
-      <div className="stat-card bg-orange">
-        <h4>Phép năm còn lại</h4>
-        <div style={{ fontSize: "32px", fontWeight: "bold" }}>11</div>
+      <div className="stat-box bg-purple">
+        <h4>Thông báo</h4>
+        <h1>3</h1>
       </div>
     </div>
     <div className="card">
@@ -65,135 +106,58 @@ const DashboardModule = ({ user }: { user: UserProfile }) => (
         <Briefcase size={18} /> Bảng tin nội bộ
       </h3>
       <p>
-        Chào mừng <strong>{user.full_name}</strong> quay trở lại làm việc.
-      </p>
-      <p style={{ marginTop: "10px", color: "#666" }}>
-        - Thông báo: Hệ thống sẽ bảo trì vào 12:00 PM chủ nhật tuần này.
+        Xin chào <strong>{user.name}</strong>. Chúc bạn một ngày làm việc hiệu
+        quả!
       </p>
     </div>
   </div>
 );
 
-// 2. CHẤM CÔNG (Có đồng hồ & Lịch sử)
-const AttendanceModule = () => {
+// === ACTOR 1: NHÂN VIÊN (5 Chức năng) ===
+const ChamCong = () => {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
-
   useEffect(() => {
-    const timer = setInterval(
-      () => setTime(new Date().toLocaleTimeString()),
-      1000
-    );
-    return () => clearInterval(timer);
+    const t = setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
+    return () => clearInterval(t);
   }, []);
-
   return (
     <div className="card">
       <h3>
         <Clock size={18} /> Chấm Công Điện Tử
       </h3>
-      <div
-        style={{
-          textAlign: "center",
-          padding: "20px",
-          borderBottom: "1px solid #eee",
-          marginBottom: "20px",
-        }}
-      >
-        <div
-          style={{
-            fontSize: "48px",
-            fontWeight: "bold",
-            color: "#2c3e50",
-            fontFamily: "monospace",
-          }}
+      <div style={{ textAlign: "center", padding: "30px" }}>
+        <h1
+          style={{ fontSize: "48px", color: "#2c3e50", marginBottom: "20px" }}
         >
           {time}
-        </div>
-        <div style={{ fontSize: "14px", color: "#7f8c8d" }}>
-          {new Date().toLocaleDateString("vi-VN", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </div>
-        <div
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            justifyContent: "center",
-            gap: "20px",
-          }}
+        </h1>
+        <button
+          className="btn-action btn-success"
+          style={{ padding: "10px 30px", fontSize: "16px" }}
         >
-          <button
-            className="btn-action btn-success"
-            style={{ padding: "10px 30px", fontSize: "16px" }}
-          >
-            Check-in (Vào ca)
-          </button>
-          <button
-            className="btn-action btn-danger"
-            style={{ padding: "10px 30px", fontSize: "16px" }}
-          >
-            Check-out (Ra ca)
-          </button>
-        </div>
+          CHECK-IN
+        </button>
+        <button
+          className="btn-action btn-danger"
+          style={{ padding: "10px 30px", fontSize: "16px", marginLeft: "10px" }}
+        >
+          CHECK-OUT
+        </button>
       </div>
-      <h4>Lịch sử chấm công</h4>
-      <table className="data-table" style={{ marginTop: "10px" }}>
-        <thead>
-          <tr>
-            <th>Ngày</th>
-            <th>Vào ca</th>
-            <th>Ra ca</th>
-            <th>Tổng giờ</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Hôm nay</td>
-            <td>07:55:00</td>
-            <td>--:--:--</td>
-            <td>Running</td>
-            <td>
-              <span className="badge badge-active">Đúng giờ</span>
-            </td>
-          </tr>
-          <tr>
-            <td>Hôm qua</td>
-            <td>08:10:00</td>
-            <td>17:00:00</td>
-            <td>7h50</td>
-            <td>
-              <span className="badge badge-pending">Đi muộn</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
   );
 };
-
-// 3. XIN PHÉP (Form)
-const LeaveRequestModule = () => (
+const XinPhep = () => (
   <div className="card">
     <h3>
       <FileText size={18} /> Đơn Xin Nghỉ Phép
     </h3>
-    <div className="form-row">
-      <div className="form-field">
-        <label>Loại nghỉ</label>
-        <select>
-          <option>Phép năm</option>
-          <option>Nghỉ ốm</option>
-          <option>Việc riêng</option>
-        </select>
-      </div>
-      <div className="form-field">
-        <label>Số ngày nghỉ</label>
-        <input type="number" defaultValue={1} />
-      </div>
+    <div className="form-group">
+      <label>Loại nghỉ</label>
+      <select>
+        <option>Phép năm</option>
+        <option>Nghỉ ốm</option>
+      </select>
     </div>
     <div className="form-row">
       <div className="form-field">
@@ -206,688 +170,720 @@ const LeaveRequestModule = () => (
       </div>
     </div>
     <div className="form-group">
-      <label>Lý do nghỉ</label>
-      <textarea rows={3} placeholder="Nhập lý do chi tiết..."></textarea>
+      <label>Lý do</label>
+      <textarea rows={3}></textarea>
     </div>
-    <button
-      className="btn-action btn-primary"
-      onClick={() => alert("Đã gửi đơn!")}
-    >
-      Gửi Đơn
-    </button>
+    <button className="btn-action btn-primary">Gửi Đơn</button>
   </div>
 );
-
-// 4. ĐỔI CA
-const ShiftChangeModule = () => (
+const DoiCa = () => (
   <div className="card">
     <h3>
       <RefreshCw size={18} /> Đăng Ký Đổi Ca
     </h3>
     <div className="form-row">
       <div className="form-field">
-        <label>Ngày cần đổi</label>
+        <label>Ngày đổi</label>
         <input type="date" />
       </div>
       <div className="form-field">
         <label>Ca hiện tại</label>
-        <input
-          type="text"
-          value="Ca Sáng (8h-17h)"
-          disabled
-          style={{ background: "#f9f9f9" }}
-        />
+        <input type="text" value="Ca Sáng" disabled />
       </div>
     </div>
     <div className="form-row">
       <div className="form-field">
-        <label>Muốn đổi sang</label>
+        <label>Đổi sang</label>
         <select>
-          <option>Ca Chiều (13h-22h)</option>
+          <option>Ca Chiều</option>
           <option>Ca Đêm</option>
         </select>
       </div>
       <div className="form-field">
         <label>Người đổi cùng</label>
         <select>
-          <option>-- Chọn đồng nghiệp --</option>
-          <option>Nguyễn Văn B (Bếp)</option>
+          <option>Nguyễn Văn B</option>
         </select>
       </div>
     </div>
-    <button
-      className="btn-action btn-warning"
-      onClick={() => alert("Đã gửi yêu cầu đổi ca!")}
-    >
-      Gửi Yêu Cầu
-    </button>
+    <button className="btn-action btn-primary">Gửi Yêu Cầu</button>
   </div>
 );
-
-// 5. DUYỆT (Cho Trưởng BP)
-const ApproveModule = ({ type }: { type: "leave" | "shift" }) => (
+const XemCaLam = () => (
   <div className="card">
     <h3>
-      <CheckCircle size={18} />{" "}
-      {type === "leave" ? "Duyệt Đơn Xin Nghỉ" : "Duyệt Yêu Cầu Đổi Ca"}
+      <Calendar size={18} /> Lịch Làm Việc Của Tôi
     </h3>
     <table className="data-table">
       <thead>
         <tr>
-          <th>Nhân viên</th>
-          <th>{type === "leave" ? "Loại nghỉ" : "Đổi từ"}</th>
-          <th>Chi tiết</th>
-          <th>Thao tác</th>
+          <th>Thứ</th>
+          <th>Ngày</th>
+          <th>Ca làm việc</th>
+          <th>Khu vực</th>
         </tr>
       </thead>
       <tbody>
-        {type === "leave" ? (
-          <tr>
-            <td>Nguyễn Văn A</td>
-            <td>Phép năm</td>
-            <td>25/12 - 26/12</td>
-            <td>
-              <button className="btn-action btn-success">Duyệt</button>{" "}
-              <button className="btn-action btn-danger">Huỷ</button>
-            </td>
-          </tr>
-        ) : (
-          <tr>
-            <td>Trần Thị B</td>
-            <td>Ca Sáng</td>
-            <td>Sang Ca Chiều ngày 28/12</td>
-            <td>
-              <button className="btn-action btn-success">Duyệt</button>{" "}
-              <button className="btn-action btn-danger">Huỷ</button>
-            </td>
-          </tr>
-        )}
+        <tr>
+          <td>Thứ 2</td>
+          <td>25/12</td>
+          <td>Ca Sáng (08:00 - 17:00)</td>
+          <td>Khu Bếp Á</td>
+        </tr>
+        <tr>
+          <td>Thứ 3</td>
+          <td>26/12</td>
+          <td>Ca Sáng (08:00 - 17:00)</td>
+          <td>Khu Bếp Á</td>
+        </tr>
+        <tr>
+          <td>Thứ 4</td>
+          <td>27/12</td>
+          <td>Ca Chiều (13:00 - 22:00)</td>
+          <td>Khu Bếp Á</td>
+        </tr>
       </tbody>
     </table>
   </div>
 );
-
-// 6. TUYỂN DỤNG
-const RecruitmentModule = ({ subview }: { subview: "plan" | "candidates" }) => (
+const PhieuLuongCaNhan = ({ user }: { user: any }) => (
   <div className="card">
     <h3>
-      <Search size={18} />{" "}
-      {subview === "plan" ? "Kế Hoạch Tuyển Dụng" : "Hồ Sơ Ứng Viên"}
+      <DollarSign size={18} /> Phiếu Lương Cá Nhân
     </h3>
-    {subview === "plan" ? (
-      <div>
-        <div className="form-row">
-          <div className="form-field">
-            <label>Vị trí</label>
-            <input type="text" placeholder="VD: Đầu bếp Á" />
-          </div>
-          <div className="form-field">
-            <label>Số lượng</label>
-            <input type="number" />
-          </div>
-          <div className="form-field">
-            <label>Hạn tuyển</label>
-            <input type="date" />
-          </div>
-        </div>
-        <button className="btn-action btn-primary">Đăng Tin Tuyển Dụng</button>
-        <table className="data-table" style={{ marginTop: "20px" }}>
-          <thead>
-            <tr>
-              <th>Vị trí</th>
-              <th>Số lượng</th>
-              <th>Hạn</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Phục vụ bàn</td>
-              <td>5</td>
-              <td>31/12/2025</td>
-              <td>
-                <span className="badge badge-active">Đang tuyển</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div
+      style={{
+        padding: "20px",
+        background: "#f9f9f9",
+        border: "1px solid #ddd",
+        borderRadius: "4px",
+      }}
+    >
+      <div className="form-row">
+        <span>Lương cơ bản:</span>
+        <strong>8,000,000 đ</strong>
       </div>
-    ) : (
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Ứng viên</th>
-            <th>Vị trí</th>
-            <th>Kinh nghiệm</th>
-            <th>Trạng thái</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Lê Văn X</td>
-            <td>Bếp chính</td>
-            <td>5 Năm</td>
-            <td>
-              <span className="badge badge-pending">Chờ PV</span>
-            </td>
-            <td>
-              <button className="btn-action btn-primary">Chuyển PV</button>
-            </td>
-          </tr>
-          <tr>
-            <td>Phạm Thị Y</td>
-            <td>Thu ngân</td>
-            <td>1 Năm</td>
-            <td>
-              <span className="badge badge-active">Đã nhận CV</span>
-            </td>
-            <td>
-              <button className="btn-action btn-warning">Xem CV</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    )}
-  </div>
-);
-
-// 7. PHỎNG VẤN
-const InterviewModule = ({ subview }: { subview: "schedule" | "score" }) => (
-  <div className="card">
-    <h3>
-      <UserCheck size={18} />{" "}
-      {subview === "schedule" ? "Lịch Phỏng Vấn" : "Đánh Giá Ứng Viên"}
-    </h3>
-    {subview === "schedule" ? (
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Ngày giờ</th>
-            <th>Ứng viên</th>
-            <th>Vị trí</th>
-            <th>Người PV</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>26/12 09:00</td>
-            <td>Lê Văn X</td>
-            <td>Bếp chính</td>
-            <td>Trần Bếp Trưởng</td>
-          </tr>
-        </tbody>
-      </table>
-    ) : (
-      <div>
-        <div className="form-group">
-          <label>Chọn ứng viên</label>
-          <select>
-            <option>Lê Văn X (Bếp chính) - 09:00</option>
-          </select>
-        </div>
-        <div className="form-row">
-          <div className="form-field">
-            <label>Điểm chuyên môn</label>
-            <input type="number" />
-          </div>
-          <div className="form-field">
-            <label>Điểm kỹ năng</label>
-            <input type="number" />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Nhận xét</label>
-          <textarea rows={3}></textarea>
-        </div>
-        <button className="btn-action btn-success">Lưu Kết Quả</button>
+      <div className="form-row">
+        <span>Phụ cấp:</span>
+        <strong>+ 1,500,000 đ</strong>
       </div>
-    )}
-  </div>
-);
-
-// 8. NHÂN SỰ & HỢP ĐỒNG (IN PDF)
-const HRRecordsModule = ({ subview }: { subview: "list" | "contracts" }) => {
-  const exportPDF = () => {
-    const doc = new jsPDF();
-    doc.text("DANH SACH HOP DONG LAO DONG", 10, 10);
-    (doc as any).autoTable({
-      head: [["Nhan Vien", "Loai HD", "Ngay Het Han", "Trang Thai"]],
-      body: [
-        ["Nguyen Van A", "Chinh thuc", "31/12/2026", "Hieu luc"],
-        ["Tran Thi B", "Thu viec", "31/12/2025", "Sap het han"],
-      ],
-    });
-    doc.save("BaoCao_HopDong.pdf");
-  };
-
-  return (
-    <div className="card">
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h3>
-          <FileSignature size={18} />{" "}
-          {subview === "list" ? "Hồ Sơ Nhân Viên" : "Quản Lý Hợp Đồng"}
-        </h3>
-        {subview === "contracts" && (
-          <button className="btn-action btn-primary" onClick={exportPDF}>
-            <Printer size={14} /> Xuất PDF
-          </button>
-        )}
+      <div className="form-row" style={{ color: "red" }}>
+        <span>Khấu trừ:</span>
+        <strong>- 500,000 đ</strong>
       </div>
-      <table className="data-table" style={{ marginTop: "15px" }}>
-        <thead>
-          {subview === "list" ? (
-            <tr>
-              <th>Mã NV</th>
-              <th>Họ tên</th>
-              <th>Phòng ban</th>
-              <th>Thao tác</th>
-            </tr>
-          ) : (
-            <tr>
-              <th>Nhân viên</th>
-              <th>Loại HĐ</th>
-              <th>Ngày kết thúc</th>
-              <th>Trạng thái</th>
-            </tr>
-          )}
-        </thead>
-        <tbody>
-          {subview === "list" ? (
-            <tr>
-              <td>NV001</td>
-              <td>Nguyễn Văn A</td>
-              <td>Bếp</td>
-              <td>
-                <button className="btn-action btn-primary">Sửa</button>
-              </td>
-            </tr>
-          ) : (
-            <tr>
-              <td>Nguyễn Văn A</td>
-              <td>Chính thức</td>
-              <td>01/01/2026</td>
-              <td>
-                <span className="badge badge-active">Hiệu lực</span>
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <hr style={{ margin: "10px 0" }} />
+      <div className="form-row" style={{ fontSize: "18px", color: "green" }}>
+        <span>THỰC LĨNH:</span>
+        <strong>9,000,000 đ</strong>
+      </div>
     </div>
-  );
-};
+    <button className="btn-action btn-primary" style={{ marginTop: "15px" }}>
+      <Printer size={14} /> Tải PDF
+    </button>
+  </div>
+);
 
-// 9. LƯƠNG & KẾ TOÁN
-const PayrollModule = ({ role }: { role: "HR" | "Accountant" }) => (
+// === ACTOR 2: TRƯỞNG BỘ PHẬN ===
+const DuyetDon = () => (
   <div className="card">
     <h3>
-      {role === "HR" ? (
-        <>
-          <DollarSign size={18} /> Tính Lương
-        </>
-      ) : (
-        <>
-          <CreditCard size={18} /> Chi Trả Lương
-        </>
-      )}
+      <CheckCircle size={18} /> Duyệt Đơn Nghỉ Phép
     </h3>
     <table className="data-table">
       <thead>
         <tr>
           <th>Nhân viên</th>
-          <th>Lương CB</th>
-          <th>Thực lĩnh</th>
-          <th>Trạng thái</th>
-          {role === "Accountant" && <th>Thao tác</th>}
+          <th>Lý do</th>
+          <th>Thời gian</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Nguyễn Văn A</td>
-          <td>8,000,000</td>
+          <td>Việc riêng</td>
+          <td>25/12 - 26/12</td>
           <td>
-            <b>8,660,000</b>
+            <button className="btn-action btn-success">Duyệt</button>{" "}
+            <button className="btn-action btn-danger">Huỷ</button>
           </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const DuyetDoiCa = () => (
+  <div className="card">
+    <h3>
+      <RefreshCw size={18} /> Duyệt Đổi Ca
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Nhân viên</th>
+          <th>Đổi sang</th>
+          <th>Người đổi cùng</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Trần Thị B</td>
+          <td>Ca Chiều</td>
+          <td>Nguyễn Văn A</td>
           <td>
-            <span className="badge badge-pending">Chờ thanh toán</span>
+            <button className="btn-action btn-success">Duyệt</button>
           </td>
-          {role === "Accountant" && (
-            <td>
-              <button className="btn-action btn-success">Pay</button>
-            </td>
-          )}
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const DuyetTuyenDung = () => (
+  <div className="card">
+    <h3>
+      <ClipboardList size={18} /> Duyệt Yêu Cầu Tuyển Dụng
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Bộ phận</th>
+          <th>Vị trí</th>
+          <th>Số lượng</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Bếp</td>
+          <td>Phụ bếp</td>
+          <td>2</td>
+          <td>
+            <button className="btn-action btn-success">Duyệt</button>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
 );
 
-// 10. ADMIN NÂNG CẤP (QUẢN LÝ USER & CẤU HÌNH)
-const AdminModule = () => {
-  const [activeTab, setActiveTab] = useState("users");
-  const [usersList, setUsersList] = useState([
-    { id: 1, username: "nhanvien", role: "NhanVien", status: "Active" },
-    { id: 2, username: "truongbp", role: "TruongBoPhan", status: "Active" },
-    { id: 3, username: "qlns", role: "QuanLyNhanSu", status: "Active" },
-    { id: 4, username: "user_cu", role: "NhanVien", status: "Locked" },
-  ]);
-
-  const toggleStatus = (id: number) => {
-    const updated = usersList.map((u) =>
-      u.id === id
-        ? { ...u, status: u.status === "Active" ? "Locked" : "Active" }
-        : u
-    );
-    setUsersList(updated);
-  };
-
-  return (
-    <div className="card">
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          marginBottom: "20px",
-        }}
-      >
-        <h3>
-          <Shield size={20} /> Quản Trị Hệ Thống
-        </h3>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button
-            className={`btn-action ${
-              activeTab === "users" ? "btn-primary" : "btn-warning"
-            }`}
-            onClick={() => setActiveTab("users")}
-          >
-            <Users size={14} /> Users
-          </button>
-          <button
-            className={`btn-action ${
-              activeTab === "config" ? "btn-primary" : "btn-warning"
-            }`}
-            onClick={() => setActiveTab("config")}
-          >
-            <Settings size={14} /> Config
-          </button>
-        </div>
+// === ACTOR 3: TUYỂN DỤNG (4 Chức năng tách biệt) ===
+const DangTinTuyenDung = () => (
+  <div className="card">
+    <h3>
+      <ClipboardList size={18} /> Đăng Tin Tuyển Dụng
+    </h3>
+    <div className="form-row">
+      <div className="form-field">
+        <label>Tiêu đề</label>
+        <input type="text" placeholder="VD: Tuyển gấp Bếp trưởng" />
       </div>
-
-      {activeTab === "users" ? (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Role</th>
-              <th>Trạng thái</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usersList.map((u) => (
-              <tr key={u.id}>
-                <td>{u.username}</td>
-                <td>
-                  <span
-                    style={{
-                      background: "#e3f2fd",
-                      color: "#1565c0",
-                      padding: "2px 5px",
-                      borderRadius: "4px",
-                      fontSize: "11px",
-                    }}
-                  >
-                    {u.role}
-                  </span>
-                </td>
-                <td>
-                  <span
-                    className={`badge ${
-                      u.status === "Active" ? "badge-active" : "badge-danger"
-                    }`}
-                  >
-                    {u.status}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className={`btn-action ${
-                      u.status === "Active" ? "btn-danger" : "btn-success"
-                    }`}
-                    onClick={() => toggleStatus(u.id)}
-                  >
-                    {u.status === "Active" ? "Khoá" : "Mở"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <div>
-          <div className="form-row">
-            <div className="form-field">
-              <label>Phút đi trễ cho phép</label>
-              <input type="number" defaultValue={15} />
-            </div>
-            <div className="form-field">
-              <label>Mức phạt (VND)</label>
-              <input type="number" defaultValue={50000} />
-            </div>
-          </div>
-          <button
-            className="btn-action btn-success"
-            onClick={() => alert("Đã lưu cấu hình!")}
-          >
-            Lưu Thay Đổi
-          </button>
-        </div>
-      )}
+      <div className="form-field">
+        <label>Vị trí</label>
+        <input type="text" />
+      </div>
     </div>
-  );
-};
+    <div className="form-group">
+      <label>Mô tả</label>
+      <textarea rows={3}></textarea>
+    </div>
+    <button className="btn-action btn-primary">Đăng Tin</button>
+  </div>
+);
+const SangLocHoSo = () => (
+  <div className="card">
+    <h3>
+      <Search size={18} /> Sàng Lọc Hồ Sơ (CV)
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Ứng viên</th>
+          <th>Vị trí</th>
+          <th>Kinh nghiệm</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lê Văn X</td>
+          <td>Bếp chính</td>
+          <td>5 năm</td>
+          <td>
+            <button className="btn-action btn-success">Duyệt</button>{" "}
+            <button className="btn-action btn-danger">Loại</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const LenLichPV = () => (
+  <div className="card">
+    <h3>
+      <Calendar size={18} /> Lên Lịch Phỏng Vấn
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Ứng viên</th>
+          <th>Ngày giờ PV</th>
+          <th>Người PV</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <strong>Lê Văn X</strong>
+          </td>
+          <td>
+            <input
+              type="datetime-local"
+              style={{ padding: "5px", border: "1px solid #ddd" }}
+            />
+          </td>
+          <td>
+            <select style={{ padding: "5px" }}>
+              <option>Trần Bếp Trưởng</option>
+            </select>
+          </td>
+          <td>
+            <button className="btn-action btn-primary">Lưu</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const ChuyenHoSoSangPV = () => (
+  <div className="card">
+    <h3>
+      <UserCheck size={18} /> Chuyển Hồ Sơ Sang Phỏng Vấn
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Ứng viên</th>
+          <th>Lịch đã chốt</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Lê Văn X</td>
+          <td>26/12 09:00</td>
+          <td>
+            <span className="badge badge-pending">Chưa chuyển</span>
+          </td>
+          <td>
+            <button className="btn-action btn-success">Chuyển Ngay</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
 
-// --- LOGIN SCREEN ---
-const LoginScreen = ({ onLogin }: { onLogin: (u: UserProfile) => void }) => {
+// === ACTOR 4: PHỎNG VẤN ===
+const LichPhongVan = () => (
+  <div className="card">
+    <h3>
+      <Clock size={18} /> Lịch Phỏng Vấn
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Thời gian</th>
+          <th>Ứng viên</th>
+          <th>Vị trí</th>
+          <th>Người PV</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>26/12 09:00</td>
+          <td>Lê Văn X</td>
+          <td>Bếp chính</td>
+          <td>Trần Bếp Trưởng</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const ChamDiem = () => (
+  <div className="card">
+    <h3>
+      <UserCheck size={18} /> Đánh Giá & Chấm Điểm
+    </h3>
+    <div className="form-group">
+      <label>Ứng viên</label>
+      <select>
+        <option>Lê Văn X</option>
+      </select>
+    </div>
+    <div className="form-row">
+      <div className="form-field">
+        <label>Điểm CM</label>
+        <input type="number" />
+      </div>
+      <div className="form-field">
+        <label>Kết quả</label>
+        <select>
+          <option>Đạt</option>
+          <option>Loại</option>
+        </select>
+      </div>
+    </div>
+    <button className="btn-action btn-success">Lưu Kết Quả</button>
+  </div>
+);
+
+// === ACTOR 5: QUẢN LÝ NHÂN SỰ (HR) ===
+const QuanLyHoSoNV = () => (
+  <div className="card">
+    <h3>
+      <Users size={18} /> Quản Lý Hồ Sơ Nhân Viên
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Mã NV</th>
+          <th>Họ tên</th>
+          <th>Phòng ban</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>NV01</td>
+          <td>Nguyễn Văn A</td>
+          <td>Bếp</td>
+          <td>
+            <span className="badge badge-active">Active</span>
+          </td>
+          <td>
+            <button className="btn-action btn-primary">Sửa</button>
+          </td>
+        </tr>
+        <tr>
+          <td>NV02</td>
+          <td>Trần Thị B</td>
+          <td>Lễ tân</td>
+          <td>
+            <span className="badge badge-pending">Nghỉ phép</span>
+          </td>
+          <td>
+            <button className="btn-action btn-primary">Sửa</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const QuanLyHopDong = () => (
+  <div className="card">
+    <h3>
+      <FileSignature size={18} /> Quản Lý Hợp Đồng
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Nhân viên</th>
+          <th>Loại HĐ</th>
+          <th>Hết hạn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nguyễn Văn A</td>
+          <td>Chính thức</td>
+          <td>31/12/2026</td>
+          <td>
+            <span className="badge badge-active">Hiệu lực</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Trần Thị B</td>
+          <td>Thử việc</td>
+          <td>01/01/2025</td>
+          <td>
+            <span className="badge badge-pending">Sắp hết</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const TinhLuongHR = () => (
+  <div className="card">
+    <h3>
+      <DollarSign size={18} /> Tính Lương & Chốt Công
+    </h3>
+    <div className="form-row">
+      <div className="form-field">
+        <label>Tháng</label>
+        <select>
+          <option>Tháng 12</option>
+        </select>
+      </div>
+      <div className="form-field">
+        <label>Năm</label>
+        <input type="number" defaultValue={2025} />
+      </div>
+    </div>
+    <button className="btn-action btn-primary" style={{ marginBottom: "15px" }}>
+      Tính Toán
+    </button>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Nhân viên</th>
+          <th>Ngày công</th>
+          <th>Lương CB</th>
+          <th>Tổng lương</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nguyễn Văn A</td>
+          <td>26</td>
+          <td>8,000,000</td>
+          <td>
+            <strong>9,000,000</strong>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const BaoCaoNhanSu = () => (
+  <div className="card">
+    <h3>
+      <Printer size={18} /> Báo Cáo Nhân Sự
+    </h3>
+    <div style={{ marginTop: "10px" }}>
+      <button className="btn-action btn-primary">
+        Báo cáo biến động nhân sự
+      </button>
+      <button className="btn-action btn-primary">
+        Danh sách nhân viên sắp hết HĐ
+      </button>
+    </div>
+  </div>
+);
+
+// === ACTOR 6: KẾ TOÁN ===
+const BangLuongKeToan = () => (
+  <div className="card">
+    <h3>
+      <CreditCard size={18} /> Thanh Toán Lương
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Nhân viên</th>
+          <th>Thực lĩnh</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nguyễn Văn A</td>
+          <td>9,000,000</td>
+          <td>
+            <span className="badge badge-pending">Chờ trả</span>
+          </td>
+          <td>
+            <button className="btn-action btn-success">Pay</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
+const BaoCaoChiPhi = () => (
+  <div className="card">
+    <h3>
+      <PieChart size={18} /> Báo Cáo Chi Phí
+    </h3>
+    <div className="stats-grid">
+      <div className="stat-box bg-purple">
+        <h4>Quỹ lương tháng</h4>
+        <h2>500 Triệu</h2>
+      </div>
+    </div>
+  </div>
+);
+
+// === ACTOR 7: ADMIN ===
+const QuanLyUser = () => (
+  <div className="card">
+    <h3>
+      <Shield size={18} /> Quản Lý User
+    </h3>
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {MOCK_USERS.map((u) => (
+          <tr key={u.id}>
+            <td>{u.username}</td>
+            <td>{u.roleName}</td>
+            <td>Active</td>
+            <td>
+              <button className="btn-action btn-danger">Lock</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+const CauHinh = () => (
+  <div className="card">
+    <h3>
+      <Settings size={18} /> Cấu Hình Hệ Thống
+    </h3>
+    <div className="form-group">
+      <label>Phút đi trễ cho phép</label>
+      <input type="number" defaultValue={15} />
+    </div>
+    <button className="btn-action btn-success">Lưu</button>
+  </div>
+);
+
+// --- MAIN APP ---
+export default function App() {
+  const [user, setUser] = useState<any>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [view, setView] = useState("dashboard");
   const [error, setError] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const users: UserProfile[] = [
-      {
-        id: "1",
-        username: "nhanvien",
-        full_name: "Nguyễn Văn A",
-        role: "NhanVien",
-        department: "Bếp",
-      },
-      {
-        id: "2",
-        username: "truongbp",
-        full_name: "Trần Bếp Trưởng",
-        role: "TruongBoPhan",
-        department: "Bếp",
-      },
-      {
-        id: "3",
-        username: "tuyendung",
-        full_name: "Lê Tuyển Dụng",
-        role: "BoPhanTuyenDung",
-        department: "Nhân Sự",
-      },
-      {
-        id: "4",
-        username: "phongvan",
-        full_name: "Phạm Phỏng Vấn",
-        role: "BoPhanPhongVan",
-        department: "Nhân Sự",
-      },
-      {
-        id: "5",
-        username: "qlns",
-        full_name: "Hoàng HR Manager",
-        role: "QuanLyNhanSu",
-        department: "Nhân Sự",
-      },
-      {
-        id: "6",
-        username: "ketoan",
-        full_name: "Vũ Kế Toán",
-        role: "KeToan",
-        department: "Tài Chính",
-      },
-      {
-        id: "7",
-        username: "admin",
-        full_name: "System Admin",
-        role: "Admin",
-        department: "IT",
-      },
-    ];
-    const user = users.find(
-      (u) => u.username === username && password === "123"
+    const found = MOCK_USERS.find(
+      (u) => u.username === username && u.password === password
     );
-    if (user) onLogin(user);
-    else setError("Sai thông tin! (Pass: 123)");
+    if (found) {
+      setUser(found);
+      setView("dashboard");
+      setError("");
+    } else {
+      setError("Sai thông tin! (Pass: 123)");
+    }
   };
-
-  return (
-    <div className="login-container">
-      <div className="login-box">
-        <h2>
-          <Briefcase size={24} /> HR System
-        </h2>
-        <form onSubmit={handleLogin}>
-          <div className="form-group">
-            <label>Tên đăng nhập</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Mật khẩu</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          {error && (
-            <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
-          )}
-          <button type="submit" className="btn-login">
-            Đăng Nhập
-          </button>
-        </form>
-        <div className="demo-note">
-          <strong>Tài khoản Demo (Pass: 123):</strong>
-          <br />
-          nhanvien, truongbp, tuyendung, phongvan, qlns, ketoan, admin
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- MAIN APP COMPONENT ---
-export default function App() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [currentView, setCurrentView] = useState("dashboard");
 
   const getMenu = () => {
     if (!user) return [];
     const base = [
-      { id: "dashboard", label: "Trang Chủ", icon: <Briefcase size={16} /> },
+      {
+        id: "dashboard",
+        label: "Trang Chủ",
+        icon: <LayoutDashboard size={16} />,
+      },
     ];
-
     switch (user.role) {
       case "NhanVien":
         return [
           ...base,
           { id: "chamcong", label: "Chấm Công", icon: <Clock size={16} /> },
-          {
-            id: "xinphep",
-            label: "Xin Nghỉ Phép",
-            icon: <FileText size={16} />,
-          },
+          { id: "xinphep", label: "Xin Nghỉ", icon: <FileText size={16} /> },
           { id: "doica", label: "Đổi Ca", icon: <RefreshCw size={16} /> },
-          { id: "luong", label: "Phiếu Lương", icon: <DollarSign size={16} /> },
+          { id: "xemca", label: "Xem Ca Làm", icon: <Calendar size={16} /> },
+          {
+            id: "luong_cn",
+            label: "Phiếu Lương",
+            icon: <DollarSign size={16} />,
+          },
         ];
       case "TruongBoPhan":
         return [
           ...base,
           {
-            id: "duyetnghi",
+            id: "duyet_nghi",
             label: "Duyệt Nghỉ",
             icon: <CheckCircle size={16} />,
           },
           {
-            id: "duyetdoica",
+            id: "duyet_ca",
             label: "Duyệt Đổi Ca",
             icon: <RefreshCw size={16} />,
+          },
+          {
+            id: "duyet_td",
+            label: "Duyệt Tuyển Dụng",
+            icon: <ClipboardList size={16} />,
           },
         ];
       case "BoPhanTuyenDung":
         return [
           ...base,
           {
-            id: "kehoachtuyendung",
-            label: "Kế Hoạch Tuyển",
+            id: "dangtin",
+            label: "Đăng Tin",
             icon: <ClipboardList size={16} />,
           },
-          { id: "hoso", label: "Hồ Sơ Ứng Viên", icon: <List size={16} /> },
+          { id: "sangloc", label: "Sàng Lọc HS", icon: <Search size={16} /> },
+          { id: "lenlich", label: "Lên Lịch PV", icon: <Calendar size={16} /> },
+          {
+            id: "chuyen_hs",
+            label: "Chuyển Hồ Sơ",
+            icon: <UserCheck size={16} />,
+          },
         ];
       case "BoPhanPhongVan":
         return [
           ...base,
-          {
-            id: "lichpv",
-            label: "Lịch Phỏng Vấn",
-            icon: <Calendar size={16} />,
-          },
-          { id: "danhgia", label: "Đánh Giá", icon: <UserCheck size={16} /> },
+          { id: "lich_pv", label: "Lịch PV", icon: <Clock size={16} /> },
+          { id: "chamdiem", label: "Chấm Điểm", icon: <UserCheck size={16} /> },
         ];
       case "QuanLyNhanSu":
         return [
           ...base,
+          { id: "hr_hoso", label: "Hồ Sơ NV", icon: <Users size={16} /> },
           {
-            id: "hosonhansu",
-            label: "Hồ Sơ Nhân Sự",
-            icon: <Users size={16} />,
-          },
-          {
-            id: "hopdong",
+            id: "hr_hopdong",
             label: "Hợp Đồng",
             icon: <FileSignature size={16} />,
           },
           {
-            id: "tinhluong",
+            id: "hr_tinhluong",
             label: "Tính Lương",
             icon: <DollarSign size={16} />,
           },
+          { id: "hr_baocao", label: "Báo Cáo", icon: <Printer size={16} /> },
         ];
       case "KeToan":
         return [
           ...base,
           {
-            id: "thanhtoan",
-            label: "Thanh Toán Lương",
+            id: "kt_luong",
+            label: "Thanh Toán",
             icon: <CreditCard size={16} />,
+          },
+          {
+            id: "kt_chiphi",
+            label: "BC Chi Phí",
+            icon: <PieChart size={16} />,
           },
         ];
       case "Admin":
         return [
           ...base,
-          {
-            id: "quantri",
-            label: "Quản Trị Hệ Thống",
-            icon: <Shield size={16} />,
-          },
+          { id: "ad_user", label: "QL User", icon: <Shield size={16} /> },
+          { id: "ad_config", label: "Cấu Hình", icon: <Settings size={16} /> },
         ];
       default:
         return base;
@@ -895,48 +891,106 @@ export default function App() {
   };
 
   const renderContent = () => {
-    switch (currentView) {
+    switch (view) {
+      // NV
       case "chamcong":
-        return <AttendanceModule />;
+        return <ChamCong />;
       case "xinphep":
-        return <LeaveRequestModule />;
+        return <XinPhep />;
       case "doica":
-        return <ShiftChangeModule />;
-      case "duyetnghi":
-        return <ApproveModule type="leave" />;
-      case "duyetdoica":
-        return <ApproveModule type="shift" />;
-      case "kehoachtuyendung":
-        return <RecruitmentModule subview="plan" />;
-      case "hoso":
-        return <RecruitmentModule subview="candidates" />;
-      case "lichpv":
-        return <InterviewModule subview="schedule" />;
-      case "danhgia":
-        return <InterviewModule subview="score" />;
-      case "hosonhansu":
-        return <HRRecordsModule subview="list" />;
-      case "hopdong":
-        return <HRRecordsModule subview="contracts" />;
-      case "tinhluong":
-        return <PayrollModule role="HR" />;
-      case "thanhtoan":
-        return <PayrollModule role="Accountant" />;
-      case "luong":
-        return (
-          <div className="card">
-            <h3>Phiếu Lương</h3>
-            <p>Đang cập nhật...</p>
-          </div>
-        );
-      case "quantri":
-        return <AdminModule />;
+        return <DoiCa />;
+      case "xemca":
+        return <XemCaLam />;
+      case "luong_cn":
+        return <PhieuLuongCaNhan user={user} />;
+      // TruongBP
+      case "duyet_nghi":
+        return <DuyetDon />;
+      case "duyet_ca":
+        return <DuyetDoiCa />;
+      case "duyet_td":
+        return <DuyetTuyenDung />;
+      // TuyenDung
+      case "dangtin":
+        return <DangTinTuyenDung />;
+      case "sangloc":
+        return <SangLocHoSo />;
+      case "lenlich":
+        return <LenLichPV />;
+      case "chuyen_hs":
+        return <ChuyenHoSoSangPV />;
+      // PhongVan
+      case "lich_pv":
+        return <LichPhongVan />;
+      case "chamdiem":
+        return <ChamDiem />;
+      // HR
+      case "hr_hoso":
+        return <QuanLyHoSoNV />;
+      case "hr_hopdong":
+        return <QuanLyHopDong />;
+      case "hr_tinhluong":
+        return <TinhLuongHR />;
+      case "hr_baocao":
+        return <BaoCaoNhanSu />;
+      // KeToan
+      case "kt_luong":
+        return <BangLuongKeToan />;
+      case "kt_chiphi":
+        return <BaoCaoChiPhi />;
+      // Admin
+      case "ad_user":
+        return <QuanLyUser />;
+      case "ad_config":
+        return <CauHinh />;
+
       default:
-        return <DashboardModule user={user!} />;
+        return <DashboardHome user={user} />;
     }
   };
 
-  if (!user) return <LoginScreen onLogin={setUser} />;
+  if (!user)
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <h2>HR System Login</h2>
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label>Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <button type="submit" className="btn-login">
+              Đăng Nhập
+            </button>
+          </form>
+          <div
+            style={{
+              marginTop: "20px",
+              background: "#f9f9f9",
+              padding: "10px",
+              fontSize: "11px",
+            }}
+          >
+            <strong>Demo Accounts (Pass: 123):</strong>
+            <br />
+            nhanvien, truongbp, tuyendung, phongvan, qlns, ketoan, admin
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="app-container">
@@ -944,43 +998,70 @@ export default function App() {
         <div className="sidebar-header">
           <Briefcase size={20} /> HR Manager
         </div>
-        <nav className="sidebar-menu">
+        <div className="sidebar-menu">
           {getMenu().map((item) => (
             <button
               key={item.id}
-              onClick={() => setCurrentView(item.id)}
-              className={`menu-item ${currentView === item.id ? "active" : ""}`}
+              className={`menu-item ${view === item.id ? "active" : ""}`}
+              onClick={() => setView(item.id)}
             >
               {item.icon} {item.label}
             </button>
           ))}
-        </nav>
+        </div>
         <div className="sidebar-footer">
-          <div className="user-info">
-            <div className="avatar">
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <div
+              style={{
+                width: "30px",
+                height: "30px",
+                background: "#3498db",
+                borderRadius: "50%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               {user.username.slice(0, 2).toUpperCase()}
             </div>
-            <div className="user-details">
-              <h4>{user.full_name}</h4>
-              <span>{user.role}</span>
+            <div>
+              <div style={{ fontSize: "13px", fontWeight: "bold" }}>
+                {user.name}
+              </div>
+              <div style={{ fontSize: "11px", opacity: 0.8 }}>
+                {user.roleName}
+              </div>
             </div>
           </div>
-          <button className="btn-logout" onClick={() => setUser(null)}>
-            <LogOut size={16} /> Thoát
+          <button
+            onClick={() => setUser(null)}
+            style={{
+              width: "100%",
+              background: "#e74c3c",
+              border: "none",
+              padding: "8px",
+              color: "white",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Đăng Xuất
           </button>
         </div>
       </aside>
       <main className="main-content">
         <header className="top-header">
-          <h2 className="page-title">
-            {getMenu().find((i) => i.id === currentView)?.label}
-          </h2>
-          <div style={{ fontSize: "14px", color: "#666" }}>
-            <Calendar size={14} style={{ display: "inline" }} />{" "}
-            {new Date().toLocaleDateString("vi-VN")}
-          </div>
+          <h3>{getMenu().find((i) => i.id === view)?.label}</h3>
+          <div>{new Date().toLocaleDateString("vi-VN")}</div>
         </header>
-        <div className="content-scroll">{renderContent()}</div>
+        <div className="content-body">{renderContent()}</div>
       </main>
     </div>
   );
